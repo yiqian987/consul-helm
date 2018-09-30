@@ -3,14 +3,14 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ template "consul.fullname" . }}-server
+  name: {{ template "consul.fullname" . }}
   labels:
     app: {{ template "consul.name" . }}
     chart: {{ template "consul.chart" . }}
     heritage: {{ .Release.Service }}
     release: {{ .Release.Name }}
 spec:
-  serviceName: {{ template "consul.fullname" . }}-server
+  serviceName: {{ template "consul.fullname" . }}
   podManagementPolicy: Parallel
   replicas: {{ .Values.server.replicas }}
   {{- if (gt (int .Values.server.updatePartition) 0) }}
@@ -74,6 +74,10 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
           command:
             - "/bin/sh"
             - "-ec"
@@ -85,7 +89,7 @@ spec:
                 -bind=0.0.0.0 \
                 -bootstrap-expect={{ .Values.server.bootstrapExpect }} \
                 -client=0.0.0.0 \
-                -config-dir=/consul/config \
+                -config-dir= /etc/consul.d/agent \
                 {{- range .Values.server.extraVolumes }}
                 {{- if .load }}
                 -config-dir=/consul/userconfig/{{ .name }}
@@ -108,7 +112,7 @@ spec:
             - name: data
               mountPath: /consul/data
             - name: config
-              mountPath: /consul/config
+              mountPath:  /etc/consul.d/agent
             {{- range .Values.server.extraVolumes }}
             - name: userconfig-{{ .name }}
               readOnly: true

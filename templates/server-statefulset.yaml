@@ -105,7 +105,7 @@ spec:
                 -ui \
                 {{- end }}
                 {{- range $index := until (.Values.server.replicas | int) }}
-                -retry-join=${CONSUL_FULLNAME}-server-{{ $index }}.${CONSUL_FULLNAME}-server.${NAMESPACE}.svc \
+                -retry-join=${CONSUL_FULLNAME}-{{ $index }}.${CONSUL_FULLNAME}.${NAMESPACE}.svc \
                 {{- end }}
                 -server
           volumeMounts:
